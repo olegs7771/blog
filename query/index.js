@@ -16,6 +16,7 @@ app.get('/posts', (req, res, next) => {
   res.status(200).json(posts);
 });
 
+// COMING FROM EVENT-BUS
 app.post('/events', (req, res, next) => {
   const { type, data } = req.body;
 
@@ -26,12 +27,24 @@ app.post('/events', (req, res, next) => {
   }
   if (type === 'CommentCreated') {
     //Create comment
-    const { id, comment, postId } = data;
+    const { id, comment, postId, status } = data;
     // 1) find proper post in posts object
 
     const post = posts[postId];
-    post.comments.push({ id, comment });
+    post.comments.push({ id, comment, status });
   }
+
+  if (type === 'CommentUpdated') {
+    const { id, comment, postId, status } = data;
+    //find in object posts{} comment that we updated
+    const post = posts[postId];
+    const commentToUpdate = post.comments.find((comment) => {
+      return comment.id === id;
+    });
+    commentToUpdate.status = status;
+    commentToUpdate.comment = comment;
+  }
+
   console.log('posts in query service', posts);
   res.status(200).json({ message: 'query got event' });
 });

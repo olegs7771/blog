@@ -20,19 +20,19 @@ app.post('/posts/:id/comments', async (req, res, next) => {
   const { comment } = req.body;
   const comments = commentsByPostId[req.params.id] || [];
   console.log('comments', comments);
-  comments.push({ id: commentId, comment });
+  comments.push({ id: commentId, comment, status: 'pending' });
   commentsByPostId[req.params.id] = comments;
 
   console.log('commentsByPostId2', commentsByPostId);
 
   //Send event to event-bus
-
   await axios.post('http://localhost:4005/events', {
     type: 'CommentCreated',
     data: {
       id: commentId,
       comment,
       postId: req.params.id,
+      status: 'pending',
     },
   });
 
@@ -45,8 +45,29 @@ app.post('/posts/:id/comments', async (req, res, next) => {
 
 //Event from Event-Bus
 
-app.post('/events', (req, res, next) => {
+app.post('/events', async (req, res, next) => {
   console.log('comments received event from EB', req.body.type);
+  const { type, data } = req.body;
+  //If incoming comment already moderated the modify comment
+  if (type === 'CommentModerated') {
+    const { postId, id, status, comment } = data;
+    //pull stored comment in commentsByPostId and update
+    const comments = commentsByPostId[postId];
+    //filter trough comments for particular comment
+    const commentToUpdate = comments.find((comment) => {
+      return comment.id === id;
+    });
+    //update status
+    commentToUpdate.status = status;
+    //no need to insert it back to object array couse it the same object in memmory
+
+    //send updated event to EVENT-BUS
+    await axios.post('http://localhost:4005/events', {
+      type: 'CommentUpdated',
+      data,
+    });
+  }
+
   res
     .status(200)
     .json({ message: 'comments received event from EB ', data: req.body.type });
