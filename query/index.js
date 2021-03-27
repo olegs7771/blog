@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-// const axios= require('axios');
+const axios = require('axios');
 
 const cors = require('cors');
 
@@ -16,10 +16,7 @@ app.get('/posts', (req, res, next) => {
   res.status(200).json(posts);
 });
 
-// COMING FROM EVENT-BUS
-app.post('/events', (req, res, next) => {
-  const { type, data } = req.body;
-
+const handleEvents = (type, data) => {
   if (type === 'PostCreated') {
     const { id, title } = data;
     //Create Post
@@ -44,11 +41,25 @@ app.post('/events', (req, res, next) => {
     commentToUpdate.status = status;
     commentToUpdate.comment = comment;
   }
+};
 
-  console.log('posts in query service', posts);
+// COMING FROM EVENT-BUS
+app.post('/events', (req, res, next) => {
+  const { type, data } = req.body;
+
+  handleEvents(type, data);
   res.status(200).json({ message: 'query got event' });
 });
 
-app.listen(4002, () => {
+app.listen(4002, async () => {
   console.log('Query on 4002');
+
+  //AFTER SERVICE BACK ALIVE WE WANT TO RETREIVE ALL MISSED EVENTS PRIOR TO THIS TIME
+
+  const res = await axios.get('http://localhost:4005/events');
+
+  for (let event of res.data) {
+    console.log('Proccesing event :', event.type);
+    handleEvents(event.type, event.data);
+  }
 });
