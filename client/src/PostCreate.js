@@ -5,7 +5,7 @@ export default function PostCreate() {
   // STATE
   const [title, setTitle] = useState('');
 
-  const _onSubmit = async (e) => {
+ const _onSubmit = async (e) => {
     e.preventDefault();
     console.log('title', title);
 
@@ -13,13 +13,14 @@ export default function PostCreate() {
       const data = {
         title,
       };
-      const res = await axios.post('http://localhost:4000/posts', data);
+      const res = await axios.post('http://posts.com/posts/create', data);
       console.log('res.data post posts', res.data);
     } catch (error) {
       console.log('error', error);
     }
     setTitle('');
   };
+  
   return (
     <div>
       <form onSubmit={_onSubmit}>

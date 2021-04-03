@@ -16,7 +16,7 @@ app.post('/events', async (req, res, next) => {
     //Post to event-bus updated comments object .status updated
     console.log('data in moderation', data);
     try {
-      const res = await axios.post('http://localhost:4005/events', {
+      const res = await axios.post('http://event-bus-srv:4005/events', {
         type: 'CommentModerated',
         data: {
           ...data,
@@ -36,3 +36,4 @@ app.post('/events', async (req, res, next) => {
 app.listen(4003, () => {
   console.log('Moderation on 4003');
 });
+/////////////////////////////////////////////

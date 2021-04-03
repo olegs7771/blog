@@ -26,7 +26,7 @@ app.post('/posts/:id/comments', async (req, res, next) => {
   console.log('commentsByPostId2', commentsByPostId);
 
   //Send event to event-bus
-  await axios.post('http://localhost:4005/events', {
+  await axios.post('http://event-bus-srv:4005/events', {
     type: 'CommentCreated',
     data: {
       id: commentId,
@@ -62,7 +62,7 @@ app.post('/events', async (req, res, next) => {
     //no need to insert it back to object array couse it the same object in memmory
 
     //send updated event to EVENT-BUS
-    await axios.post('http://localhost:4005/events', {
+    await axios.post('http://event-bus-srv:4005/events', {
       type: 'CommentUpdated',
       data,
     });

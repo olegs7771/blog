@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata: 
+  name: ingress-srv
+  annotations: 
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+spec:
+  rules:
+    - host: posts.com
+      http:
+        paths:
+          - path: /posts/create
+            backend:
+              serviceName: posts-cluster-srv
+              servicePort: 4000
+          - path: /posts
+            backend:
+              serviceName: query-cluster-srv
+              servicePort: 4002
+
+          # using regex wildcard for any :id 
+          - path: /posts/?(.*)/comments    
+            backend:
+              serviceName: comments-cluster-srv
+              servicePort: 4001
+
+     # for react app using router
+     #  going at the bottom to avoid it been called every call 
+          - path: /?(.*)
+            backend:
+              serviceName: client-cluster-srv
+              servicePort: 3000

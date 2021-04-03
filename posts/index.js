@@ -13,12 +13,12 @@ const { randomBytes } = require('crypto');
 
 const posts = {};
 
-// app.get('/posts',(req,res,next)=>{
-// res.json(posts)
-// })
+app.get('/posts',(req,res,next)=>{
+res.json(posts)
+})
 
-app.post('/posts', async (req, res, next) => {
-  console.log('req body', req.body);
+app.post('/posts/create', async (req, res, next) => {
+  console.log('req body post create', req.body);
   const id = randomBytes(4).toString('hex');
   const { title } = req.body;
   posts[id] = {
@@ -27,7 +27,7 @@ app.post('/posts', async (req, res, next) => {
   };
 
   //Emit event to event-bus on new post created
-  await axios.post('http://localhost:4005/events', {
+  await axios.post('http://event-bus-srv:4005/events', {
     type: 'PostCreated',
     data: {
       title,
@@ -48,5 +48,7 @@ app.post('/events', (req, res, next) => {
 });
 
 app.listen(4000, () => {
+  console.log('version v55555');
+  console.log('version v66666');
   console.log('Posts on  4000');
 });

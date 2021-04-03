@@ -11,7 +11,7 @@ try {
   const data={
     comment
   }
-  const res = await axios.post(`http://localhost:4001/posts/${postId}/comments`,data);
+  const res = await axios.post(`http://posts.com/posts/${postId}/comments`,data);
   console.log('res.data',res.data);
   
 } catch (error) {
